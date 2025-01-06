@@ -1,24 +1,12 @@
-import configparser
-from typing import TypeVar
+from abc import ABC
+from typing import TypeVar, Any, Dict
 ConfigurationHandlerType = TypeVar("ConfigurationHandlerType")
 
 
-class AbstractConfigurationHandler:
-    _shared_configuration_handler = None
-
-    def __init__(self):
-        self._config = None
-
-    @property
-    def config(self):
-        return self._config
-
-    @config.setter
-    def config(self, value):
-        self._config = value
+class AbstractConfigurationHandler(ABC):
+    config_handler: Dict = None
+    config_file_path: str = None
 
     @staticmethod
     def get_configuration_handler() -> ConfigurationHandlerType:
-        if AbstractConfigurationHandler._shared_configuration_handler is None:
-            AbstractConfigurationHandler._shared_configuration_handler = AbstractConfigurationHandler()
-        return AbstractConfigurationHandler._shared_configuration_handler
+        pass
