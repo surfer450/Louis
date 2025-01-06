@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Any, List
 
 
 class Rule(ABC):
@@ -14,10 +15,10 @@ class Rule(ABC):
         Args:
             trigger_value (int): The threshold or condition value that the rule uses for evaluation.
         """
-        self.data_list = []
+        self.data_list: List[Any] = []
         self.trigger_value = trigger_value
 
-    def add_data(self, data):
+    def add_data(self, data: Any) -> None:
         """
         Add a data item to the internal data list for evaluation.
 
@@ -37,7 +38,7 @@ class Rule(ABC):
         """
         pass
 
-    def get_device_data(self):
+    def get_device_data(self) -> List[Any]:
         """
         Retrieve the list of stored data items.
 
@@ -46,7 +47,7 @@ class Rule(ABC):
         """
         return self.data_list
 
-    def set_rule_trigger(self, trigger_value):
+    def set_rule_trigger(self, trigger_value: int) -> None:
         """
         Update the trigger value for the rule.
 
@@ -56,7 +57,7 @@ class Rule(ABC):
         self.trigger_value = trigger_value
 
     @abstractmethod
-    def reset(self):
+    def reset(self) -> None:
         """
         Reset the state of the rule by clearing the internal data list.
 
