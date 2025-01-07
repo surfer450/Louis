@@ -22,7 +22,27 @@ class AbstractConfigurationHandler(ABC):
         a lock to ensure thread-safe operations.
         """
         self._config = self.retrieve_config()
-        self.lock = Lock()
+        self._lock = Lock()
+
+    @property
+    def lock(self) -> Lock:
+        """
+        Gets the current lock object.
+
+        Returns:
+            Lock: The current Lock object used for thread-safety.
+        """
+        return self._lock
+
+    @lock.setter
+    def lock(self, lock: Lock) -> None:
+        """
+        Sets a new lock object for thread-safety.
+
+        Args:
+            lock (Lock): The new Lock object to be assigned.
+        """
+        self._lock = lock
 
     @property
     def config(self) -> Dict:
