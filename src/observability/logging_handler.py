@@ -22,7 +22,6 @@ class LoggerHandler:
         and initializes the logger using the logging configuration file.
         """
         self._logger = None
-        self._lock = Lock()
         self.initialize_logger()
 
     def initialize_logger(self):
@@ -56,26 +55,6 @@ class LoggerHandler:
             value (Logger): The logger instance to be assigned.
         """
         self._logger = value
-
-    @property
-    def lock(self) -> Lock:
-        """
-        Gets the lock object used for ensuring thread-safety.
-
-        Returns:
-            Lock: The current Lock object.
-        """
-        return self._lock
-
-    @lock.setter
-    def lock(self, lock: Lock) -> None:
-        """
-        Sets a new lock object for thread-safety.
-
-        Args:
-            lock (Lock): The new Lock object to be assigned.
-        """
-        self._lock = lock
 
     @staticmethod
     def get_logger_handler() -> LoggerHandlerType:
