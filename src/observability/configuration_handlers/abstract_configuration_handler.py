@@ -1,53 +1,99 @@
 from abc import ABC, abstractmethod
-from json import loads
+from json import loads, dumps
+from threading import Lock
 from typing import TypeVar, Dict
-from src.observability.configuration_handlers.shared_logic.helpers.configuration_reader import ConfigurationReader
+from src.observability.configuration_handlers.shared_logic.handlers.file_handler import FileHandler
 
 ConfigurationHandlerType = TypeVar("ConfigurationHandlerType")
 
 
 class AbstractConfigurationHandler(ABC):
     """
-    AbstractConfigurationHandler serves as a base class for handling configuration management
-    in a standardized way. It provides methods to retrieve and update a configuration handler
-    from a specified configuration file.
+    An abstract base class for handling configuration files. This class provides methods for
+    retrieving, updating, and changing configuration, as well as ensuring thread-safety using locks.
 
-    The class relies on a configuration file path and a configuration reader to load the configuration.
-
-    Attributes:
-        config_handler (Dict): A dictionary that holds the current configuration handler.
-                               Initialized to None and updated via `update_config_handler`.
-        config_file_path (str): The path to the configuration file from which the handler is read.
+    Subclasses must implement the method to provide the path to the configuration file.
     """
+    shared_config = None
 
-    config_handler: Dict = None
-    config_file_path: str = None
-
-    @classmethod
-    @abstractmethod
-    def get_configuration_handler(cls) -> ConfigurationHandlerType:
+    def __init__(self):
         """
-        An abstract method that must be implemented by subclasses to provide the logic for retrieving
-        the configuration handler.
+        Initializes the configuration handler, retrieves the current configuration, and sets up
+        a lock to ensure thread-safe operations.
+        """
+        self._config = self.retrieve_config()
+        self.lock = Lock()
 
-        Args:
-            cls: The class invoking the method.
+    @property
+    def config(self) -> Dict:
+        """
+        Retrieves the current configuration.
 
         Returns:
-            ConfigurationHandlerType: The configuration handler instance.
+            Dict: The current configuration.
+        """
+        return self._config
+
+    @config.setter
+    def config(self, value: Dict) -> None:
+        """
+        Sets a new configuration.
+
+        Args:
+            value (Dict): The new configuration to be set.
+        """
+        self._config = value
+
+    @abstractmethod
+    def get_config_path(self) -> str:
+        """
+        Abstract method to retrieve the path to the configuration file.
+
+        Returns:
+            str: The path to the configuration file.
         """
         pass
 
-    @classmethod
-    def update_config_handler(cls) -> None:
+    def retrieve_config(self) -> Dict:
         """
-        Updates the `config_handler` class attribute by reading the configuration file specified by
-        `config_file_path`. The configuration is expected to be in JSON format and is parsed into a
-        dictionary using `loads`.
+        Retrieves the configuration by reading the file specified by the subclass's
+        `get_config_path` method. Ensures thread-safety using a lock.
 
-        This method should be called if `config_handler` is None or needs to be refreshed.
+        Returns:
+            Dict: The configuration data as a dictionary.
+        """
+        with self.lock:
+            return loads(FileHandler.read_file(self.get_config_path()))
+
+    def update_config(self) -> None:
+        """
+        Updates the current configuration by retrieving the latest configuration from the file.
+        Ensures thread-safety using a lock.
+        """
+        with self.lock:
+            self.config = self.retrieve_config()
+
+    def change_config(self, config: Dict) -> None:
+        """
+        Changes the current configuration and writes the updated configuration to the file.
+        Ensures thread-safety using a lock.
 
         Args:
-            cls: The class invoking the method.
+            config (Dict): The new configuration to be written to the file.
         """
-        cls.config_handler = loads(ConfigurationReader.read_configfile(cls.config_file_path))
+        with self.lock:
+            self.config = config
+            FileHandler.write_file(self.get_config_path(), dumps(config))
+
+    @classmethod
+    def get_configuration_handler(cls) -> ConfigurationHandlerType:
+        """
+        Retrieves the singleton instance of the configuration handler. If no instance exists,
+        a new one is created.
+
+        Returns:
+            ConfigurationHandlerType: The singleton instance of the configuration handler.
+        """
+        if cls.shared_config is None:
+            cls.shared_config = cls()
+        return cls.shared_config
