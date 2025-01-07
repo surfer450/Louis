@@ -16,16 +16,6 @@ class DeviceException(Exception):
         super().__init__(message)
 
 
-class DeviceNotFoundException(DeviceException):
-    """
-    Raised when a device cannot be found or accessed.
-    """
-
-    def __init__(self, device_name: str):
-        message = f"The device '{device_name}' could not be found or accessed."
-        super().__init__(message)
-
-
 class DeviceOpenException(DeviceException):
     """
     Raised when a device cannot be opened for operation.

@@ -1,7 +1,6 @@
 from logging import Logger
 from typing import Any
-import cv2
-from cv2 import Mat
+from cv2 import Mat, VideoCapture, flip
 from numpy import ndarray, dtype
 
 from src.exceptions.device_exceptions import (
@@ -21,7 +20,7 @@ class Camera(Device):
         camera_index (int): Index of the camera device.
         flip_value (int): Value used to flip the captured frame.
         device_name (str): Name of the device.
-        capture (cv2.VideoCapture): OpenCV VideoCapture instance.
+        capture (VideoCapture): OpenCV VideoCapture instance.
         is_recording (bool): Flag indicating whether the camera is recording.
     """
 
@@ -49,14 +48,14 @@ class Camera(Device):
             DeviceOpenException: If the camera cannot be opened.
         """
         if self.capture is None:
-            self.capture = cv2.VideoCapture(self.camera_index)
+            self.capture = VideoCapture(self.camera_index)
 
         if not self.capture.isOpened():
             self.logger.error(f"Failed to open {self.device_name}")
             raise DeviceOpenException(device_name=self.device_name)
 
         self.is_recording = True
-        self.logger.info(f"{self.device_name} opened successfully!")
+        self.logger.debug(f"{self.device_name} opened successfully!")
 
     def stop_device_recording(self) -> None:
         """
@@ -66,7 +65,7 @@ class Camera(Device):
             self.capture.release()
             self.capture = None
         self.is_recording = False
-        self.logger.info("Camera recording stopped.")
+        self.logger.debug("Camera recording stopped.")
 
     def device_recording_logic(self) -> Mat | ndarray[Any, dtype] | ndarray:
         """
@@ -77,13 +76,24 @@ class Camera(Device):
 
         Raises:
             DeviceNotRecordingException: If the camera is not recording.
-            DeviceNoOutputException: If no frame is captured during recording.
         """
         if self.is_recording and self.capture:
-            ret, frame = self.capture.read()
-            if not ret:
-                raise DeviceNoOutputException(device_name=self.device_name, content_name="frame")
-            frame = cv2.flip(frame, self.flip_value)
-            return frame
+            return self._get_frame()
         else:
             raise DeviceNotRecordingException(device_name=self.device_name)
+
+    def _get_frame(self):
+        """
+        Captures a frame from the camera and returns it.
+
+        Returns:
+            Mat | ndarray: Captured frame (numpy array).
+
+        Raises:
+            DeviceNoOutputException: If no frame is captured during recording.
+        """
+        ret, frame = self.capture.read()
+        if not ret:
+            raise DeviceNoOutputException(device_name=self.device_name, content_name="frame")
+        frame = flip(frame, self.flip_value)
+        return frame
