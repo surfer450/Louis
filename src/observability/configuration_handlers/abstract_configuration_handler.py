@@ -21,8 +21,9 @@ class AbstractConfigurationHandler(ABC):
         Initializes the configuration handler, retrieves the current configuration, and sets up
         a lock to ensure thread-safe operations.
         """
-        self._config = self.retrieve_config()
         self._lock = Lock()
+        self._config = self.retrieve_config()
+
 
     @property
     def lock(self) -> Lock:

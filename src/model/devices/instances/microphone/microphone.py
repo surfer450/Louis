@@ -1,48 +1,29 @@
-from typing import Tuple
-from numpy import ndarray, int16, float32, frombuffer, sqrt, mean
-from pyaudio import PyAudio, paInt16
-from src.exceptions.device_exceptions import (
-    DeviceOpenException,
-    DeviceNotRecordingException,
-    DeviceNoOutputException
-)
 from src.model.devices.abstract_device import Device
+from src.model.streams.instances.microphone.microphone_stream import MicrophoneStream
 from src.observability.configuration_handlers.abstract_configuration_handler import AbstractConfigurationHandler
 from src.observability.logging_handler.abstract_logging_handler import AbstractLoggingHandler
 
 
 class Microphone(Device):
+    """
+    A class representing a microphone device.
 
-    def __init__(self, microphone_index: int, configuration_handler: AbstractConfigurationHandler,
-                 logging_handler: AbstractLoggingHandler):
+    This class inherits from the `Device` class and provides functionality to interact with a microphone device.
+    It initializes a microphone stream using the `MicrophoneStream` class, enabling operations like opening, closing,
+    and capturing audio from the microphone. The microphone's configuration and logging are managed by external
+    handlers passed during instantiation.
+    """
 
+    def __init__(self, microphone_index: int, configuration_handler: type(AbstractConfigurationHandler),
+                 logging_handler: type(AbstractLoggingHandler)):
+        """
+        Initializes the Microphone device with the given configuration handler and logging handler.
+
+        Args:
+            microphone_index (int): The index of the microphone device.
+            configuration_handler (AbstractConfigurationHandler): The handler for configuration settings.
+            logging_handler (AbstractLoggingHandler): The handler for logging operations.
+        """
         super().__init__(device_index=microphone_index, configuration_handler=configuration_handler,
                          logging_handler=logging_handler)
-        self.pyaudio_object = PyAudio()
-
-    def open_stream(self):
-        self.stream = self.pyaudio_object.open(format=paInt16,
-                                               channels=1,
-                                               rate=self.config["rate"],
-                                               input=True,
-                                               input_device_index=self.device_index,
-                                               frames_per_buffer=self.config["audio_chunk"])
-
-    def close_stream(self):
-        self.stream.stop_stream()
-        self.stream.close()
-
-    def is_stream_activate(self):
-        return self.stream.is_active()
-
-    def get_stream_data(self):
-        try:
-            data = frombuffer(self.stream.read(self.config["audio_chunk"], exception_on_overflow=False),
-                              dtype=int16).astype(float32)
-            volume = sqrt(mean(data ** 2))
-            return data, volume
-
-        except Exception as e:
-            self.logger.error(f"Error reading sound from {self.device_name}: {e}")
-            raise DeviceNoOutputException(device_name=self.device_name, content_name="audio")
-
+        self.stream = MicrophoneStream(self.device_index, self.config, self.logger)

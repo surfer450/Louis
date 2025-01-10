@@ -9,5 +9,5 @@ class MicrophoneDeviceConfigurationHandler(AbstractConfigurationHandler):
     settings for microphone devices dynamically.
     """
     def get_config_path(self) -> str:
-        return "configurations/devices/camera/microphone_device_config.json"
+        return "configurations/devices/microphone/microphone_device_config.json"
 
