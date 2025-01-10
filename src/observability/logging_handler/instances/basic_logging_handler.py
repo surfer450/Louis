@@ -12,7 +12,7 @@ class BasicLoggingHandler(AbstractLoggingHandler):
     to access the logger instance with thread-safety using a lock.
     """
 
-    def initialize_logger(self):
+    def initialize_logger(self) -> None:
         """
         Initializes the logger by loading the configuration from a JSON file and setting it up
         using the logging module's dictConfig.

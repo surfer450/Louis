@@ -1,8 +1,13 @@
-from numpy import int16, float32, frombuffer, sqrt, mean
+from typing import Any
+
+from numpy import int16, float32, frombuffer, sqrt, mean, ndarray, dtype
 from pyaudio import PyAudio, paInt16
 from src.exceptions.stream_exceptions import StreamNoOutputException, StreamWontStartException, \
     StreamWontCloseException, StreamIsInvalid
-from src.model.streams.abstract_stream import Stream
+from src.model.device_track.abstract_track.abstract_stream import Stream
+from src.observability.configuration_handlers.instances.microphone_device_configuration_handler import \
+    MicrophoneDeviceConfigurationHandler
+from src.observability.logging_handler.instances.basic_logging_handler import BasicLoggingHandler
 
 
 class MicrophoneStream(Stream):
@@ -13,7 +18,28 @@ class MicrophoneStream(Stream):
     It interfaces with the PyAudio library to capture audio data and process it into usable information.
     """
 
-    def open_stream(self):
+    def __init__(self, device_index: int):
+        """
+        Initializes the MicrophoneStream instance.
+
+        This constructor sets up the microphone stream by accepting the device index, which corresponds to
+        the specific microphone input device. It also initializes the logger and configuration handler,
+        and prepares the microphone stream for audio capture.
+
+        Args:
+            device_index (int): The device index of the microphone to stream from. This corresponds
+                                 to the microphone index in the system's device list (e.g., 0 for the first microphone,
+                                 1 for the second).
+
+        Raises:
+            StreamWontStartException: If the microphone stream cannot be opened due to an error,
+                                      such as an invalid device index or configuration.
+        """
+        super().__init__(device_index)
+        self.logger = BasicLoggingHandler.get_logging_handler().logger
+        self.config = MicrophoneDeviceConfigurationHandler.get_configuration_handler().config
+
+    def open_stream(self) -> None:
         """
         Opens the microphone input stream.
 
@@ -36,7 +62,7 @@ class MicrophoneStream(Stream):
             self.logger.error(f"Error opening {self.__class__.__name__}")
             raise StreamWontStartException(stream_name=self.__class__.__name__, failure_reason=exception.__str__())
 
-    def close_stream(self):
+    def close_stream(self) -> None:
         """
         Closes the microphone input stream.
 
@@ -54,7 +80,7 @@ class MicrophoneStream(Stream):
             self.logger.error(f"Error closing {self.__class__.__name__}")
             raise StreamWontCloseException(stream_name=self.__class__.__name__, failure_reason=exception.__str__())
 
-    def is_stream_active(self):
+    def is_stream_active(self) -> bool:
         """
         Checks if the microphone stream is currently active.
 
@@ -73,7 +99,7 @@ class MicrophoneStream(Stream):
             self.logger.error(f"Error accessing {self.__class__.__name__}")
             raise StreamIsInvalid(stream_name=self.__class__.__name__, failure_reason=exception.__str__())
 
-    def get_stream_data(self):
+    def get_stream_data(self) -> tuple[ndarray[tuple[int, ...], dtype], Any]:
         """
         Retrieves audio data from the microphone stream.
 

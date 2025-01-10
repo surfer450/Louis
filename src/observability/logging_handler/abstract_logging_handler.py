@@ -26,7 +26,7 @@ class AbstractLoggingHandler(ABC):
         self.initialize_logger()
 
     @abstractmethod
-    def initialize_logger(self):
+    def initialize_logger(self) -> None:
         """
         Initializes the logger by loading the configuration from a JSON file and setting it up
         using the logging module's dictConfig.

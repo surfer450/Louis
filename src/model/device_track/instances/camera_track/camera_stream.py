@@ -1,7 +1,11 @@
-from cv2 import VideoCapture, flip, error as cv2error
+from cv2 import VideoCapture, flip, error as cv2error, Mat
+from numpy import ndarray, dtype
 from src.exceptions.stream_exceptions import StreamNoOutputException, StreamWontStartException, \
     StreamWontCloseException, StreamIsInvalid
-from src.model.streams.abstract_stream import Stream
+from src.model.device_track.abstract_track.abstract_stream import Stream
+from src.observability.configuration_handlers.instances.camera_device_configuration_handler import \
+    CameraDeviceConfigurationHandler
+from src.observability.logging_handler.instances.basic_logging_handler import BasicLoggingHandler
 
 
 class CameraStream(Stream):
@@ -11,7 +15,27 @@ class CameraStream(Stream):
     It uses OpenCV `VideoCapture` class to interact with the camera and captures frames from the video stream.
     """
 
-    def open_stream(self):
+    def __init__(self, device_index: int):
+        """
+        Initializes the CameraStream instance.
+
+        This constructor initializes the camera stream by setting the device index and
+        setting up the logger and configuration handler instances.
+
+        Args:
+            device_index (int): The device index of the camera to stream from. This corresponds
+                                 to the camera index in the system's device list (e.g., 0 for the first camera,
+                                 1 for the second).
+
+        Raises:
+            StreamWontStartException: If the camera stream cannot be opened due to an error, such as an invalid
+                                      device index or unsupported format.
+        """
+        super().__init__(device_index)
+        self.logger = BasicLoggingHandler.get_logging_handler().logger
+        self.config = CameraDeviceConfigurationHandler.get_configuration_handler().config
+
+    def open_stream(self) -> None:
         """
         Opens the camera input stream.
 
@@ -29,7 +53,7 @@ class CameraStream(Stream):
             self.logger.error(f"Error opening {self.__class__.__name__}")
             raise StreamWontStartException(stream_name=self.__class__.__name__, failure_reason=exception.__str__())
 
-    def close_stream(self):
+    def close_stream(self) -> None:
         """
         Closes the camera input stream.
 
@@ -45,7 +69,7 @@ class CameraStream(Stream):
             self.logger.error(f"Error closing {self.__class__.__name__}")
             raise StreamWontCloseException(stream_name=self.__class__.__name__, failure_reason=exception.__str__())
 
-    def is_stream_active(self):
+    def is_stream_active(self) -> bool:
         """
         Checks if the camera stream is currently active.
 
@@ -64,7 +88,7 @@ class CameraStream(Stream):
             self.logger.error(f"Error accessing {self.__class__.__name__}")
             raise StreamIsInvalid(stream_name=self.__class__.__name__, failure_reason=exception.__str__())
 
-    def get_stream_data(self):
+    def get_stream_data(self) -> Mat | ndarray[any, dtype] | ndarray:
         """
         Retrieves video frame data from the camera stream.
 

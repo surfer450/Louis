@@ -10,22 +10,20 @@ class Device(ABC):
     recordings, and retrieving data from the stream.
     """
 
-    def __init__(self, device_index, logging_handler, configuration_handler):
+    def __init__(self, device_index: int):
         """
         Initializes the Device class with necessary parameters like device index, logging handler,
         and configuration handler.
 
         Args:
             device_index (int): Index of the device.
-            logging_handler (LoggingHandler): Handler for logging activities.
-            configuration_handler (ConfigurationHandler): Handler for retrieving configuration details.
         """
         self.device_index = device_index
-        self.logger = logging_handler.get_logging_handler().logger
-        self.config = configuration_handler.get_configuration_handler().config
         self.is_recording = False
         self.device_name = f"{self.__class__.__name__} {self.device_index}"
         self.stream = None
+        self.logger = None
+        self.config = None
 
     def start_device_recording(self) -> None:
         """

@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Any
 
 
 class Stream(ABC):
@@ -9,22 +10,20 @@ class Stream(ABC):
     It defines the core methods that should be implemented by any subclass to handle stream operations
     """
 
-    def __init__(self, device_index, config, logger):
+    def __init__(self, device_index: int):
         """
         Initializes the Stream object with the necessary parameters.
 
         Args:
             device_index (int): The index or identifier of the device to stream from.
-            config (dict): Configuration settings for the stream.
-            logger (Logger): Logger instance for logging information and errors related to the stream.
         """
         self.device_index = device_index
-        self.config = config
-        self.logger = logger
+        self.config = None
+        self.logger = None
         self.stream = None
 
     @abstractmethod
-    def open_stream(self):
+    def open_stream(self) -> None:
         """
         Opens the stream from the device.
 
@@ -36,7 +35,7 @@ class Stream(ABC):
         pass
 
     @abstractmethod
-    def close_stream(self):
+    def close_stream(self) -> None:
         """
         Closes the stream and releases the resources.
 
@@ -48,7 +47,7 @@ class Stream(ABC):
         pass
 
     @abstractmethod
-    def is_stream_active(self):
+    def is_stream_active(self) -> bool:
         """
         Checks if the stream is currently active and open.
 
@@ -61,7 +60,7 @@ class Stream(ABC):
         pass
 
     @abstractmethod
-    def get_stream_data(self):
+    def get_stream_data(self) -> Any:
         """
         Retrieves the data from the stream.
 
