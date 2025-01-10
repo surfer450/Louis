@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from json import load
 from logging import getLogger, Logger
 from logging import config
@@ -7,7 +8,7 @@ from typing import TypeVar
 LoggerHandlerType = TypeVar("LoggerHandlerType")
 
 
-class LoggerHandler:
+class AbstractLoggingHandler(ABC):
     """
     A singleton class that provides logging functionality using a shared logger instance.
 
@@ -24,6 +25,7 @@ class LoggerHandler:
         self._logger = None
         self.initialize_logger()
 
+    @abstractmethod
     def initialize_logger(self):
         """
         Initializes the logger by loading the configuration from a JSON file and setting it up
@@ -31,10 +33,7 @@ class LoggerHandler:
 
         The configuration file should be located at 'configurations/logging_config.json'.
         """
-        with open("configurations/logging_config.json") as configuration_file:
-            dict_configuration = load(configuration_file)
-        config.dictConfig(dict_configuration)
-        self._logger = getLogger("LouisLogger")
+        pass
 
     @property
     def logger(self) -> Logger:
@@ -56,8 +55,8 @@ class LoggerHandler:
         """
         self._logger = value
 
-    @staticmethod
-    def get_logger_handler() -> LoggerHandlerType:
+    @classmethod
+    def get_logging_handler(cls) -> LoggerHandlerType:
         """
         Retrieves the singleton instance of the LoggerHandler class.
 
@@ -66,6 +65,6 @@ class LoggerHandler:
         Returns:
             LoggerHandlerType: The singleton LoggerHandler instance.
         """
-        if LoggerHandler._shared_logger_handler is None:
-            LoggerHandler._shared_logger_handler = LoggerHandler()
-        return LoggerHandler._shared_logger_handler
+        if cls._shared_logger_handler is None:
+            cls._shared_logger_handler = cls()
+        return cls._shared_logger_handler

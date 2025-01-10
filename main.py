@@ -1,4 +1,4 @@
-from src.observability.logging_handler import LoggerHandler
+from src.observability.logging_handler.instances.basic_logging_handler import LoggerHandler
 
 
 def main():
