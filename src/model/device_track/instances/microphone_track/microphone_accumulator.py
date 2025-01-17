@@ -1,48 +1,33 @@
-import time
-from typing import List
+from time import time
+from typing import Any
 from src.model.device_track.abstract_track.abstract_accumulators.abstract_list_accumulator import ListAccumulator
-from src.observability.configuration_handlers.instances.microphone_device_configuration_handler import \
-    MicrophoneDeviceConfigurationHandler
 
 
 class MicrophoneAccumulator(ListAccumulator):
     """
-    A concrete implementation of the `ListAccumulator` class, specifically designed for accumulating
-    microphone sound data. This class handles the insertion of sound data (as lists of integers), enforces
-    certain insertion conditions based on volume, and controls when data retrieval is allowed based on
-    elapsed time since the last insertion.
+    A concrete implementation of the ListAccumulator that manages microphone data.
+    This class extends the ListAccumulator by adding functionality to track the
+    timestamp of the most recent data insertion.
     """
 
     def __init__(self):
         """
-        Initializes the `MicrophoneAccumulator` with configuration settings for the microphone device.
-        The configuration is loaded via `MicrophoneDeviceConfigurationHandler`.
-
-        Attributes like `last_insertion_timestamp` are initialized to track the time of data insertions.
+        Initialize the MicrophoneAccumulator with an empty list and no timestamp for the last insertion.
         """
-        super().__init__(MicrophoneDeviceConfigurationHandler.get_configuration_handler().config)
+        super().__init__()
         self.last_insertion_timestamp = None
 
-    def insert_data(self, sound: List[int]) -> None:
+    def update_metadata_in_insertion(self) -> None:
         """
-        Inserts new sound data into the accumulator, appends it to the accumulated data list, and
-        records the timestamp of the insertion.
+        Update the metadata after data insertion by recording the current timestamp.
+        """
+        self.last_insertion_timestamp = time()
 
-        Args:
-            sound (List[int]): The microphone sound data (represented as a list of integers) to insert.
+    def pull_metadata(self) -> time:
         """
-        self.accumulate_point.append(sound)
-        self.last_insertion_timestamp = time.time()
-
-    def is_retrieval_legal(self) -> bool:
-        """
-        Checks if enough time has passed since the last data insertion to allow retrieval of accumulated data.
+        Retrieve the timestamp of the most recent data insertion.
 
         Returns:
-            bool: True if the time since the last insertion exceeds the configured silence time threshold,
-                  allowing data retrieval. False otherwise.
+            float: The Unix timestamp of the last data insertion, or `None` if no data has been inserted.
         """
-        if self.last_insertion_timestamp is not None:
-            time_since_last_insertion = time.time() - self.last_insertion_timestamp
-            return time_since_last_insertion > self.config["silence_time_threshold"]
-        return False
+        return self.last_insertion_timestamp

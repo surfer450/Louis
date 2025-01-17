@@ -1,3 +1,5 @@
+import time
+
 import cv2
 from src.model.device_track.instances.camera_track.camera import Camera
 from src.model.device_track.instances.microphone_track.microphone import Microphone
@@ -14,10 +16,11 @@ def main():
     mic.start_device_recording()
     mic_accumulator = MicrophoneAccumulator()
 
-    while mic_accumulator.is_retrieval_legal() is not True:
+    while mic_accumulator.pull_metadata() is None or time.time() - mic_accumulator.pull_metadata() < 2:
         sound, volume = mic.device_recording_logic()
         print(volume)
-        mic_accumulator.insert_data(sound)
+        if volume > 300:
+            mic_accumulator.insert_data(sound)
 
     for data in mic_accumulator:
         print(data)

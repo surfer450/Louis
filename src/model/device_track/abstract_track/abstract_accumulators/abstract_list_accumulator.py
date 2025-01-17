@@ -5,31 +5,25 @@ from src.model.device_track.abstract_track.abstract_accumulators.abstract_accumu
 
 class ListAccumulator(Accumulator):
     """
-    A concrete implementation of the `Accumulator` class that uses a list to accumulate data.
-
-    This class provides the functionality of accumulating data into a list, iterating over it,
-    and checking whether insertion and retrieval operations are legal.
+    A concrete implementation of the Accumulator class that uses a list as the accumulation point.
+    This class provides logic for appending data to a list and iterating through its elements.
     """
 
-    def __init__(self, config):
+    def __init__(self):
         """
-        Initializes the ListAccumulator with an empty list and configuration settings.
-
-        Args:
-            config (Any): Configuration settings to control the behavior of the accumulator.
+        Initialize the ListAccumulator with an empty list as the accumulate point.
         """
-        super().__init__([], config)
+        super().__init__(accumulate_point=[])
 
     def __next__(self):
         """
-        Retrieves the next item from the accumulated list. If there are no more items,
-        a StopIteration exception is raised.
-
-        Returns:
-            Any: The next item in the accumulation point (list).
+        Retrieve the next element in the list during iteration.
 
         Raises:
-            StopIteration: If there are no more items in the list to retrieve.
+            StopIteration: If there are no more elements to iterate through.
+
+        Returns:
+            Any: The next element in the list.
         """
         if self.index >= len(self.accumulate_point):
             raise StopIteration
@@ -37,26 +31,30 @@ class ListAccumulator(Accumulator):
         self.index += 1
         return item
 
-    @abstractmethod
-    def insert_data(self, data: Any) -> None:
+    def insert_data_logic(self, data: Any) -> None:
         """
-        Abstract method to insert new data into the accumulated list. Should be implemented by subclasses.
+        Append the provided data to the list.
 
         Args:
-            data (Any): The data to be inserted into the list.
+            data (Any): The data to be appended to the list.
+        """
+        self.accumulate_point.append(data)
 
-        Raises:
-            ValueError: If the data insertion is not allowed (based on legality checks).
+    @abstractmethod
+    def update_metadata_in_insertion(self) -> None:
+        """
+        Define the logic for updating metadata after inserting data into the list.
+        This method must be implemented in a subclass.
         """
         pass
 
     @abstractmethod
-    def is_retrieval_legal(self) -> bool:
+    def pull_metadata(self) -> Any:
         """
-        Abstract method to determine if data retrieval from the list is allowed.
-        Should be implemented by subclasses.
+        Retrieve metadata associated with the list accumulator.
+        This method must be implemented in a subclass.
 
         Returns:
-            bool: True if data retrieval is allowed, otherwise False.
+            Any: The metadata of the accumulator.
         """
         pass

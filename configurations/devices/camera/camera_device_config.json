@@ -1,3 +1,4 @@
 {
-  "flip_value": 1
+  "flip_value": 1,
+  "amount_of_legal_frames": 10
 }
