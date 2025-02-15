@@ -42,6 +42,7 @@ class Accumulator(ABC):
         """
         pass
 
+    @abstractmethod
     def insert_data(self, data: Any) -> None:
         """
         Insert data into the Accumulator and update its metadata.
@@ -49,32 +50,3 @@ class Accumulator(ABC):
         Args:
             data (Any): The data to be inserted into the Accumulator.
         """
-        self.insert_data_logic(data)
-        self.update_metadata_in_insertion()
-
-    @abstractmethod
-    def insert_data_logic(self, data: Any) -> None:
-        """
-        Define the custom logic for inserting data into the Accumulator.
-
-        Args:
-            data (Any): The data to be inserted.
-        """
-        pass
-
-    @abstractmethod
-    def update_metadata_in_insertion(self) -> None:
-        """
-        Update the metadata related to the Accumulator after a data insertion.
-        """
-        pass
-
-    @abstractmethod
-    def pull_metadata(self) -> Any:
-        """
-        Retrieve and return metadata associated with the Accumulator.
-
-        Returns:
-            Any: The metadata of the Accumulator.
-        """
-        pass

@@ -1,6 +1,6 @@
 from abc import abstractmethod
 from typing import Any
-from src.model.device_track.abstract_track.abstract_accumulators.abstract_accumulator import Accumulator
+from src.shared_logic.abstract_accumulators.abstract_accumulator import Accumulator
 
 
 class ListAccumulator(Accumulator):
@@ -31,7 +31,7 @@ class ListAccumulator(Accumulator):
         self.index += 1
         return item
 
-    def insert_data_logic(self, data: Any) -> None:
+    def insert_data(self, data: Any) -> None:
         """
         Append the provided data to the list.
 
@@ -39,22 +39,3 @@ class ListAccumulator(Accumulator):
             data (Any): The data to be appended to the list.
         """
         self.accumulate_point.append(data)
-
-    @abstractmethod
-    def update_metadata_in_insertion(self) -> None:
-        """
-        Define the logic for updating metadata after inserting data into the list.
-        This method must be implemented in a subclass.
-        """
-        pass
-
-    @abstractmethod
-    def pull_metadata(self) -> Any:
-        """
-        Retrieve metadata associated with the list accumulator.
-        This method must be implemented in a subclass.
-
-        Returns:
-            Any: The metadata of the accumulator.
-        """
-        pass
