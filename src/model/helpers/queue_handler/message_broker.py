@@ -2,6 +2,7 @@
 import threading
 from typing import Any, Optional
 
+from src.model.helpers.queue_handler.exchanges.base_exchange import BaseExchange
 from src.model.helpers.queue_handler.factories.queue_factory import QueueFactory
 from src.model.helpers.queue_handler.factories.exchange_factory import ExchangeFactory
 from src.model.helpers.queue_handler.exchanges.exchange_type import ExchangeType
@@ -16,7 +17,7 @@ class MessageBroker:
         return QueueFactory.get_queue(name)
 
     @staticmethod
-    def create_exchange(name: str, exchange_type: ExchangeType) -> None:
+    def create_exchange(name: str, exchange_type: ExchangeType) -> BaseExchange:
         """
         Create (or retrieve an existing) exchange of the given type.
         """
