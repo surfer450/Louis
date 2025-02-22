@@ -1,55 +1,35 @@
-import asyncio
-from abc import abstractmethod
-from typing import Any
+import numpy
 from src.microservices.drivers_services.absract_driver_service.abstract_driver import Driver
-from src.microservices.drivers_services.camera_driver_service.camera import Camera
-from src.observability.configuration_handlers.instances.CameraValidatorConfigurationHandler import \
-    CameraDeviceConfigurationHandler
+from src.microservices.drivers_services.camera_driver_service.frame_helper import FrameHelper
+from src.shared_logic.abstract_accumulators.abstract_list_accumulator import ListAccumulator
 
 
 class CameraDriver(Driver):
-    def __init__(self):
-        super().__init__(Camera(CameraDeviceConfigurationHandler[""]))
+    def __init__(self, brightness_threshold: int,
+                 standard_deviation_threshold: int, amount_of_legal_frames: int):
+        super().__init__(ListAccumulator())
+        self.amount_of_frames = 0
+        self.brightness_threshold = brightness_threshold
+        self.standard_deviation_threshold = standard_deviation_threshold
+        self.amount_of_legal_frames = amount_of_legal_frames
 
-    async def activate_driver(self) -> None:
-        await asyncio.gather(
-            self.device.start_device_recording(self.inner_input_driver_queue),
-            self.process_input_data(),
-            self.process_validated_data(),
-            self.process_output_data()
-        )
+    def is_input_data_valid(self, data: numpy.ndarray) -> bool:
+        brightness = FrameHelper.get_frame_brightness(data)
+        if brightness < self.brightness_threshold:
+            return False
 
-    async def process_input_data(self) -> None:
-        sequence_id = 0
-        while True:
-            data = await self.inner_input_driver_queue.get()
-            task = asyncio.create_task(self.is_input_data_valid(data, sequence_id))
-            sequence_id += 1
+        variation = FrameHelper.get_frame_variation(data)
+        if variation < self.standard_deviation_threshold:
+            return False
 
-    async def is_input_data_valid(self, data: Any, sequence_id: int) -> None:
-        if await self.input_validation_logic(data):
-            async with self.lock:
-                self.inner_validated_data_deriver_dict[sequence_id] = data
+        return True
 
-    @abstractmethod
-    async def input_validation_logic(self, data: Any) -> bool:
-        pass
+    def input_activation(self):
+        self.amount_of_frames += 1
 
-    async def process_validated_data(self):
-        while True:
-            async with self.lock:
-                if self.current_sequence_id in self.inner_validated_data_deriver_dict.keys():
-                    await self.inner_accumulating_driver_queue.put(
-                        self.inner_validated_data_deriver_dict[self.current_sequence_id]
-                    )
-                    self.inner_validated_data_deriver_dict.pop(self.current_sequence_id)
-                    self.current_sequence_id += 1
+    def is_output_data_valid(self) -> bool:
+        return self.amount_of_frames > self.amount_of_legal_frames
 
-    async def process_output_data(self) -> None:
-        while True:
-            if await self.is_output_data_valid():
-                await self.external_output_driver_queue.put(self.inner_accumulating_driver_queue)
-
-    @abstractmethod
-    async def is_output_data_valid(self) -> bool:
-        pass
+    def output_activation(self):
+        self.accumulator = ListAccumulator()
+        self.amount_of_frames = 0

@@ -1,9 +1,7 @@
-import asyncio
+from queue import Queue
 
-from numpy import int16, float32, frombuffer, sqrt, mean, ndarray, dtype
+from numpy import int16, float32, frombuffer
 from pyaudio import PyAudio, paInt16
-from pyaudio import PyAudio, paInt16
-
 from src.microservices.drivers_services.device_exceptions import DeviceWontStartException, DeviceWontCloseException
 from src.microservices.drivers_services.absract_driver_service.abstract_device import Device
 
@@ -35,34 +33,13 @@ class Microphone(Device):
                                      input_device_index=self.device_index,
                                      frames_per_buffer=self.audio_chunk)
 
-    async def start_device_recording(self, output_queue) -> None:
-        """
-        Starts recording from the device by opening the stream and ensuring it's activated.
-
-        If the stream is not open, it attempts to open it. If the stream cannot be activated,
-        it raises a DeviceOpenException.
-        """
+    def device_recording_logic(self, output_queue: Queue) -> None:
         try:
-            loop = asyncio.get_running_loop()
-            while True:
-                raw_data = await loop.run_in_executor(
-                    None,  # Uses the default ThreadPoolExecutor
-                    self.stream.read,  # Function to run
-                    self.audio_chunk,  # First argument
-                    False  # exception_on_overflow=False
-                )
+            while self.is_recording:
+                raw_data = self.stream.read(self.audio_chunk, exception_on_overflow=False)
                 data = frombuffer(raw_data, dtype=int16).astype(float32)
-                print(data)
-                await output_queue.put(data)
+                output_queue.put(data)
 
         except (OSError, ValueError, AttributeError) as exception:
             self.logger.error(f"Error opening {self.__class__.__name__}")
             raise DeviceWontStartException(device_name=self.__class__.__name__, failure_reason=exception.__str__())
-
-    def stop_device_recording(self) -> None:
-        """
-        Stops the recording by closing the device stream.
-
-        Closes the stream if it's open and sets the recording state to False.
-        """
-        pass

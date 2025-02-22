@@ -1,8 +1,6 @@
-import asyncio
-
-from cv2 import VideoCapture, error as cv2error, flip
-
-from src.microservices.drivers_services.device_exceptions import DeviceWontStartException, DeviceWontCloseException, \
+from queue import Queue
+from cv2 import VideoCapture, error as cv2error, imshow, waitKey
+from src.microservices.drivers_services.device_exceptions import DeviceWontStartException, \
     DeviceNoOutputException
 from src.microservices.drivers_services.absract_driver_service.abstract_device import Device
 
@@ -24,7 +22,7 @@ class Camera(Device):
         super().__init__(camera_index)
         self.video_capture = VideoCapture(self.device_index)
 
-    async def start_device_recording(self, output_queue) -> None:
+    def device_recording_logic(self, output_queue: Queue) -> None:
         """
         Starts recording from the device by opening the stream and ensuring it's activated.
 
@@ -33,25 +31,18 @@ class Camera(Device):
         """
 
         try:
-            while True:
+            while self.is_recording:
                 ret, frame = self.video_capture.read()
                 if not ret:
                     self.logger.error(f"Error reading frames from {self.__class__.__name__}")
                     raise DeviceNoOutputException(device_name=self.__class__.__name__,
                                                   failure_reason="Error reading frames")
-                await output_queue.put(frame)
+                imshow("Camera Feed", frame)
+                if waitKey(1) & 0xFF == ord('q'):
+                    break
+                output_queue.put(frame)
 
         except (ValueError, AttributeError, cv2error) as exception:
             self.logger.error(f"Error opening {self.__class__.__name__}")
             raise DeviceWontStartException(device_name=self.__class__.__name__, failure_reason=exception.__str__())
 
-        except asyncio.CancelledError:
-            self.logger.info("Input data processing task was cancelled.")
-
-    def stop_device_recording(self) -> None:
-        """
-        Stops the recording by closing the device stream.
-
-        Closes the stream if it's open and sets the recording state to False.
-        """
-        pass
