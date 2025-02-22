@@ -7,7 +7,7 @@ class QueueInstance:
         self.name = name
         self.queue = queue.Queue(maxsize=maxsize)
 
-    def enqueue(self, message: Any):
+    def enqueue(self, message: Any) -> None:
         self.queue.put(message)
 
     def dequeue(self, block: bool = True, timeout: Optional[float] = None) -> Any:

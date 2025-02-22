@@ -8,7 +8,7 @@ class DirectExchange(BaseExchange):
     def __init__(self, name: str):
         super().__init__(name)
 
-    def publish(self, message: Any, routing_key: Optional[str] = None):
+    def publish(self, message: Any, routing_key: Optional[str] = None) -> None:
         with self._lock:
             bindings_snapshot = self.bindings.copy()
         for queue_name, binding_key in bindings_snapshot.items():

@@ -16,14 +16,14 @@ class MessageBroker:
         return QueueFactory.get_queue(name)
 
     @staticmethod
-    def create_exchange(name: str, exchange_type: ExchangeType):
+    def create_exchange(name: str, exchange_type: ExchangeType) -> None:
         """
         Create (or retrieve an existing) exchange of the given type.
         """
         return ExchangeFactory.get_exchange(name, exchange_type)
 
     @staticmethod
-    def bind_queue(exchange_name: str, queue_name: str, routing_key: Optional[str] = None):
+    def bind_queue(exchange_name: str, queue_name: str, routing_key: Optional[str] = None) -> None:
         """
         Bind a queue to an exchange with the specified routing key.
         Assumes the exchange has been created (or will be created as a default type if needed).
@@ -33,7 +33,7 @@ class MessageBroker:
         exchange.bind_queue(routing_key, queue)
 
     @staticmethod
-    def publish(exchange_name: str, message: Any, routing_key: Optional[str] = None):
+    def publish(exchange_name: str, message: Any, routing_key: Optional[str] = None) -> None:
         """
         Publish a message to an exchange. The exchange will route the message to bound queues.
         """
@@ -41,6 +41,6 @@ class MessageBroker:
         exchange.publish(message, routing_key)
 
     @staticmethod
-    def read_message(queue_name: str) -> None:
+    def read_message(queue_name: str) -> Any:
         queue_instance = QueueFactory.get_queue(queue_name)
         return queue_instance.dequeue()

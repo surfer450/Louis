@@ -11,7 +11,7 @@ class BaseExchange(ABC):
         self._lock = threading.Lock()
         self.bindings: Dict[str, Optional[str]] = {}
 
-    def bind_queue(self, key: Optional[str], queue_instance: QueueInstance):
+    def bind_queue(self, key: Optional[str], queue_instance: QueueInstance) -> None:
         """
         Thread-safe binding method.
         :param key: The routing key or pattern. For fanout exchanges, this can be None.
@@ -20,7 +20,7 @@ class BaseExchange(ABC):
         with self._lock:
             self.bindings[queue_instance.name] = key
 
-    def unbind_queue(self, key: Optional[str], queue_instance: QueueInstance):
+    def unbind_queue(self, key: Optional[str], queue_instance: QueueInstance) -> None:
         """
         Thread-safe unbinding method.
         :param key: The routing key or pattern. For fanout exchanges, this can be None.
@@ -31,7 +31,7 @@ class BaseExchange(ABC):
                 del self.bindings[queue_instance.name]
 
     @abstractmethod
-    def publish(self, message: Any, routing_key: Optional[str] = None):
+    def publish(self, message: Any, routing_key: Optional[str] = None) -> None:
         """
         Abstract publish method.
         """
