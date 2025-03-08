@@ -11,8 +11,6 @@ class QueueInstance:
         self.queue.put(message)
 
     def dequeue(self, block: bool = True, timeout: Optional[float] = None) -> Any:
-        if self.is_empty():
-            return None
         return self.queue.get(block=block, timeout=timeout)
 
     def size(self) -> int:

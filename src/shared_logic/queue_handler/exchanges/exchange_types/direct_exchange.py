@@ -1,7 +1,7 @@
 from typing import Any, Optional
 
-from src.model.helpers.queue_handler.exchanges.base_exchange import BaseExchange
-from src.model.helpers.queue_handler.factories.queue_factory import QueueFactory
+from src.shared_logic.queue_handler.exchanges.base_exchange import BaseExchange
+from src.shared_logic.queue_handler.factories.queue_factory import QueueFactory
 
 
 class DirectExchange(BaseExchange):

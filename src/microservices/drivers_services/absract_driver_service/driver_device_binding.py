@@ -2,6 +2,8 @@ from queue import Queue
 
 from src.microservices.drivers_services.absract_driver_service.abstract_device import Device
 from src.microservices.drivers_services.absract_driver_service.abstract_driver import Driver
+from src.shared_logic.queue_handler.exchanges.exchange_type import ExchangeType
+from src.shared_logic.queue_handler.message_broker import MessageBroker
 
 
 class DriverDeviceBending:
@@ -14,8 +16,3 @@ class DriverDeviceBending:
     def activate_binding(self):
         self.device.start_device_recording(self.input_queue)
         self.driver.start_driver_action(self.input_queue, self.output_queue)
-
-        while True:
-            command = self.output_queue.get()
-            for data in command:
-                print(data)
