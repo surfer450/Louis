@@ -2,9 +2,9 @@
 import threading
 from typing import Dict
 
-from src.shared_logic.queue_handler.exceptions.broker_exceptions import ExchangeNotExists, ExchangeAlreadyExists
-from src.shared_logic.queue_handler.exchanges.base_exchange import BaseExchange
-from src.shared_logic.queue_handler.exchanges.exchange_type import ExchangeType
+from src.shared_logic.message_broker.exceptions.broker_exceptions import ExchangeNotExists, ExchangeAlreadyExists
+from src.shared_logic.message_broker.exchanges.base_exchange import BaseExchange
+from src.shared_logic.message_broker.exchanges.exchange_type import ExchangeType
 
 
 class ExchangeFactory:

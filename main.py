@@ -1,39 +1,55 @@
-from queue import Queue
 from threading import Thread
 
-from src.microservices.drivers_services.absract_driver_service.driver_device_binding import DriverDeviceBending
-from src.microservices.drivers_services.camera_driver_service.camera import Camera
-from src.microservices.drivers_services.camera_driver_service.camera_driver import CameraDriver
-from src.microservices.drivers_services.microphone_driver_service.microphone import Microphone
-from src.microservices.drivers_services.microphone_driver_service.microphone_driver import MicrophoneDriver
+from src.microservices.binding_services.absract_binding_package.abstract_device import Device
+from src.microservices.binding_services.absract_binding_package.abstract_driver import Driver
+from src.microservices.binding_services.binding_service import BindingService
+from src.microservices.binding_services.bindings_packages_instances.camera_binding_package.camera import Camera
+from src.microservices.binding_services.bindings_packages_instances.camera_binding_package.camera_driver import \
+    CameraDriver
+from src.microservices.binding_services.bindings_packages_instances.microphone_binding_package.microphone import \
+    Microphone
+from src.microservices.binding_services.bindings_packages_instances.microphone_binding_package.microphone_driver import \
+    MicrophoneDriver
 from src.observability.configuration_handlers.instances.camera_device_configuration_handler import \
     CameraDeviceConfigurationHandler
 from src.observability.configuration_handlers.instances.microphone_device_configuration_handler import \
     MicrophoneDeviceConfigurationHandler
+from src.shared_logic.message_broker.message_broker import MessageBroker
 
 
-def main1():
-    mic_config = MicrophoneDeviceConfigurationHandler.get_configuration_handler().config
-    mic = Microphone(mic_config["default_microphone_index"],
-                     mic_config["rate"],
-                     mic_config["audio_chunk"])
+def main():
+    Thread(
+        target=BindingService(
+            device=Microphone(
+                MicrophoneDeviceConfigurationHandler.get_configuration_handler().config["default_microphone_index"],
+                MicrophoneDeviceConfigurationHandler.get_configuration_handler().config["rate"],
+                MicrophoneDeviceConfigurationHandler.get_configuration_handler().config["audio_chunk"]
+            ),
+            driver=MicrophoneDriver(
+                MicrophoneDeviceConfigurationHandler.get_configuration_handler().config["volume_threshold"],
+                MicrophoneDeviceConfigurationHandler.get_configuration_handler().config["silence_time_threshold"]
+            )
+        ).activate_binding
+    ).start()
 
-    mic_driver = MicrophoneDriver(mic_config["volume_threshold"],
-                                  mic_config["silence_time_threshold"])
+    Thread(
+        target=BindingService(
+            device=Camera(
+                CameraDeviceConfigurationHandler.get_configuration_handler().config["camera_default_index"]
+            ),
+            driver=CameraDriver(
+                CameraDeviceConfigurationHandler.get_configuration_handler().config["brightness_threshold"],
+                CameraDeviceConfigurationHandler.get_configuration_handler().config["standard_deviation_threshold"],
+                CameraDeviceConfigurationHandler.get_configuration_handler().config["amount_of_legal_frames"]
+            )
+        ).activate_binding
+    ).start()
 
-    driver_device_binding = DriverDeviceBending(mic, mic_driver)
-    Thread(target=driver_device_binding.activate_binding).start()
-
-
-def main2():
-    cam_config = CameraDeviceConfigurationHandler.get_configuration_handler().config
-    cam = Camera(cam_config["camera_default_index"])
-    cam_driver = CameraDriver(cam_config["brightness_threshold"],
-                              cam_config["standard_deviation_threshold"], cam_config["amount_of_legal_frames"])
-
-    driver_device_binding = DriverDeviceBending(cam, cam_driver)
-    Thread(target=driver_device_binding.activate_binding).start()
+    output_queue = MessageBroker.declare_queue("QueueProcessorOut")
+    while True:
+        for a in output_queue.dequeue():
+            print(a)
 
 
 if __name__ == '__main__':
-    main2()
+    main()

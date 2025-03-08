@@ -1,8 +1,8 @@
 # fanout_exchange.py
 from typing import Any, Optional
 
-from src.shared_logic.queue_handler.exchanges.base_exchange import BaseExchange
-from src.shared_logic.queue_handler.factories.queue_factory import QueueFactory
+from src.shared_logic.message_broker.exchanges.base_exchange import BaseExchange
+from src.shared_logic.message_broker.factories.queue_factory import QueueFactory
 
 
 class FanoutExchange(BaseExchange):

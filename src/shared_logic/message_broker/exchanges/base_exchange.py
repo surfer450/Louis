@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from threading import Lock
 from typing import Any, Dict
-from src.shared_logic.queue_handler.exceptions.broker_exceptions import QueueNotExists
-from src.shared_logic.queue_handler.factories.queue_factory import QueueFactory
+from src.shared_logic.message_broker.exceptions.broker_exceptions import QueueNotExists
+from src.shared_logic.message_broker.factories.queue_factory import QueueFactory
 
 
 class BaseExchange(ABC):

@@ -1,6 +1,6 @@
 from abc import abstractmethod
 from typing import Any
-from src.shared_logic.abstract_accumulators.abstract_accumulator import Accumulator
+from src.shared_logic.accumulators.abstract_accumulator import Accumulator
 
 
 class ListAccumulator(Accumulator):

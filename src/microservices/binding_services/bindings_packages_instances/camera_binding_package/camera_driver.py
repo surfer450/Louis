@@ -1,7 +1,7 @@
 import numpy
-from src.microservices.drivers_services.absract_driver_service.abstract_driver import Driver
-from src.microservices.drivers_services.camera_driver_service.frame_helper import FrameHelper
-from src.shared_logic.abstract_accumulators.abstract_list_accumulator import ListAccumulator
+from src.microservices.binding_services.absract_binding_package.abstract_driver import Driver
+from src.microservices.binding_services.bindings_packages_instances.camera_binding_package.frame_helper import FrameHelper
+from src.shared_logic.accumulators.list_accumulator import ListAccumulator
 
 
 class CameraDriver(Driver):

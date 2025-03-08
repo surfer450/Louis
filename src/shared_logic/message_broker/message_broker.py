@@ -1,9 +1,9 @@
-from src.shared_logic.queue_handler.exceptions.broker_exceptions import QueueAlreadyExists, ExchangeAlreadyExists, \
+from src.shared_logic.message_broker.exceptions.broker_exceptions import QueueAlreadyExists, ExchangeAlreadyExists, \
     IncorrectExchangeType
-from src.shared_logic.queue_handler.exchanges.base_exchange import BaseExchange
-from src.shared_logic.queue_handler.factories.queue_factory import QueueFactory
-from src.shared_logic.queue_handler.factories.exchange_factory import ExchangeFactory
-from src.shared_logic.queue_handler.exchanges.exchange_type import ExchangeType
+from src.shared_logic.message_broker.exchanges.base_exchange import BaseExchange
+from src.shared_logic.message_broker.factories.queue_factory import QueueFactory
+from src.shared_logic.message_broker.factories.exchange_factory import ExchangeFactory
+from src.shared_logic.message_broker.exchanges.exchange_type import ExchangeType
 
 
 class MessageBroker:

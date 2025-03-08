@@ -1,8 +1,8 @@
 import time
 import numpy
-from src.microservices.drivers_services.absract_driver_service.abstract_driver import Driver
-from src.microservices.drivers_services.microphone_driver_service.voice_helper import VoiceHelper
-from src.shared_logic.abstract_accumulators.abstract_list_accumulator import ListAccumulator
+from src.microservices.binding_services.absract_binding_package.abstract_driver import Driver
+from src.microservices.binding_services.bindings_packages_instances.microphone_binding_package.voice_helper import VoiceHelper
+from src.shared_logic.accumulators.list_accumulator import ListAccumulator
 
 
 class MicrophoneDriver(Driver):

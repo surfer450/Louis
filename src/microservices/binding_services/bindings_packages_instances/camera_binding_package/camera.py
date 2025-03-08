@@ -1,8 +1,8 @@
 from queue import Queue
 from cv2 import VideoCapture, error as cv2error, imshow, waitKey
-from src.microservices.drivers_services.device_exceptions import DeviceWontStartException, \
+from src.microservices.binding_services.exceptions.device_exceptions import DeviceWontStartException, \
     DeviceNoOutputException
-from src.microservices.drivers_services.absract_driver_service.abstract_device import Device
+from src.microservices.binding_services.absract_binding_package.abstract_device import Device
 
 
 class Camera(Device):

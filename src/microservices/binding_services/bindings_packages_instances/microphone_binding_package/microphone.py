@@ -2,8 +2,8 @@ from queue import Queue
 
 from numpy import int16, float32, frombuffer
 from pyaudio import PyAudio, paInt16
-from src.microservices.drivers_services.device_exceptions import DeviceWontStartException, DeviceWontCloseException
-from src.microservices.drivers_services.absract_driver_service.abstract_device import Device
+from src.microservices.binding_services.exceptions.device_exceptions import DeviceWontStartException
+from src.microservices.binding_services.absract_binding_package.abstract_device import Device
 
 
 class Microphone(Device):

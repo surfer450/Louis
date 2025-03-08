@@ -1,7 +1,7 @@
 from threading import Lock
 from typing import Dict
-from src.shared_logic.queue_handler.exceptions.broker_exceptions import QueueNotExists, QueueAlreadyExists
-from src.shared_logic.queue_handler.queues.queue_instance import QueueInstance
+from src.shared_logic.message_broker.exceptions.broker_exceptions import QueueNotExists, QueueAlreadyExists
+from src.shared_logic.message_broker.queues.queue_instance import QueueInstance
 
 
 class QueueFactory:
