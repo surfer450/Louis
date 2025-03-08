@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from json import loads, dumps
 from threading import Lock
 from typing import TypeVar, Dict
-from src.observability.configuration_handlers.shared_logic.handlers.file_handler import FileHandler
+from src.shared_logic.IO_handlers.file_handler import FileHandler
 
 ConfigurationHandlerType = TypeVar("ConfigurationHandlerType")
 
